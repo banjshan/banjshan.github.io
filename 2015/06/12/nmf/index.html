@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <meta charset="utf-8">
+    
+    <title>非负矩阵分解（NMF） | Data Miner</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="非负矩阵分解能够学习到对象的局部特征，例如把人脸分解成嘴巴，眼睛，鼻子等等不同的部分，在很多领域都有重要的应用，例如文本聚类，语音处理，协同过滤。其主要思想是把一个大的非负矩阵X分解为两个小矩阵（WH）的乘积，满足这两个小矩阵所有元素都不为负值的条件，即X=WH。然而完全相等很难实现，所以我们只要求能够充分接近就可以了。这时需要一个代价函数（cost function）来表示两者的差距。一种代价函">
+<meta property="og:type" content="article">
+<meta property="og:title" content="非负矩阵分解（NMF）">
+<meta property="og:url" content="http://mtpgm.com/2015/06/12/nmf/index.html">
+<meta property="og:site_name" content="Data Miner">
+<meta property="og:description" content="非负矩阵分解能够学习到对象的局部特征，例如把人脸分解成嘴巴，眼睛，鼻子等等不同的部分，在很多领域都有重要的应用，例如文本聚类，语音处理，协同过滤。其主要思想是把一个大的非负矩阵X分解为两个小矩阵（WH）的乘积，满足这两个小矩阵所有元素都不为负值的条件，即X=WH。然而完全相等很难实现，所以我们只要求能够充分接近就可以了。这时需要一个代价函数（cost function）来表示两者的差距。一种代价函">
+<meta property="og:image" content="http://mtpgm.com/img/legoplot-paper.jpg">
+<meta property="og:image" content="http://mtpgm.com/img/legoplot.png">
+<meta property="og:image" content="http://mtpgm.com/img/radial plot.png">
+<meta property="og:image" content="http://mtpgm.com/img/legend.png">
+<meta property="og:updated_time" content="2016-12-30T19:35:31.155Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="非负矩阵分解（NMF）">
+<meta name="twitter:description" content="非负矩阵分解能够学习到对象的局部特征，例如把人脸分解成嘴巴，眼睛，鼻子等等不同的部分，在很多领域都有重要的应用，例如文本聚类，语音处理，协同过滤。其主要思想是把一个大的非负矩阵X分解为两个小矩阵（WH）的乘积，满足这两个小矩阵所有元素都不为负值的条件，即X=WH。然而完全相等很难实现，所以我们只要求能够充分接近就可以了。这时需要一个代价函数（cost function）来表示两者的差距。一种代价函">
+<meta name="twitter:image" content="http://mtpgm.com/img/legoplot-paper.jpg">
+    
+
+    
+        <link rel="alternate" href="/" title="Data Miner" type="application/atom+xml" />
+    
+
+    
+        <link rel="icon" href="/css/images/zhaoqiao.ico" />
+    
+
+    <link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/libs/open-sans/styles.css">
+    <link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+    <link rel="stylesheet" href="/css/style.css">
+
+    <script src="/libs/jquery/2.1.3/jquery.min.js"></script>
+    
+    
+        <link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+    
+    
+        <link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+    
+    
+    
+    
+        <script>
+var _hmt = _hmt || [];
+(function() {
+    var hm = document.createElement("script");
+    hm.src = "//hm.baidu.com/hm.js?true";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+    
+
+
+	<!-- syntaxhighlighter -->
+	<script type="text/javascript" src="/js/shCore.js"></script>
+	<link type="text/css" rel="stylesheet" href="/js/shCore.css"/>
+	<link type="text/css" rel="stylesheet" href="/js/shThemeDefault.css"/>
+	<script type="text/javascript" src="/js/shBrushCpp.js"></script>
+	<script type="text/javascript" src="/js/shBrushPython.js"></script>
+	<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/" id="logo">
+                <i class="logo"></i>
+                <span class="site-title">Data Miner</span>
+            </a>
+            <nav id="main-nav">
+                
+                    <a class="main-nav-link" href="/.">Home</a>
+                
+                    <a class="main-nav-link" href="/archives">Archives</a>
+                
+            </nav>
+            
+                
+                <nav id="sub-nav">
+                    <div class="profile" id="profile-nav">
+                        <a id="profile-anchor" href="javascript:;">
+                            <img class="avatar" src="/css/images/qimu.png" />
+                            <i class="fa fa-caret-down"></i>
+                        </a>
+                    </div>
+                </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="Search" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="Type something..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: 'Posts',
+            PAGES: 'Pages',
+            CATEGORIES: 'Categories',
+            TAGS: 'Tags',
+            UNTITLED: '(Untitled)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/.">Home</a></td>
+                
+                    <td><a class="main-nav-link" href="/archives">Archives</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="Search" />
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+                
+
+<aside id="profile">
+    <div class="inner profile-inner">
+        <div class="base-info profile-block">
+            <img id="avatar" src="/css/images/qimu.png" />
+            <h2 id="name">bjshan</h2>
+            <h3 id="title">Algorithm Engineer</h3>
+            <span id="location"><i class="fa fa-map-marker"></i>Beijing, China</span>
+            <a id="follow" target="_blank" href="https://github.com/banjshan/">FOLLOW</a>
+        </div>
+        <div class="article-info profile-block">
+            <div class="article-info-block">
+                8
+                <span>posts</span>
+            </div>
+            <div class="article-info-block">
+                6
+                <span>tags</span>
+            </div>
+        </div>
+        
+        <div class="profile-block social-links">
+            <table>
+                <tr>
+                    
+                    
+                    <td>
+                        <a href="http://github.com/banjshan/" target="_blank" title="github" class=tooltip>
+                            <i class="fa fa-github"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="twitter" class=tooltip>
+                            <i class="fa fa-twitter"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="facebook" class=tooltip>
+                            <i class="fa fa-facebook"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="dribbble" class=tooltip>
+                            <i class="fa fa-dribbble"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="rss" class=tooltip>
+                            <i class="fa fa-rss"></i>
+                        </a>
+                    </td>
+                    
+                </tr>
+            </table>
+        </div>
+        
+    </div>
+</aside>
+
+            
+            <section id="main"><article id="post-nmf" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+            非负矩阵分解（NMF）
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2015/06/12/nmf/">
+            <time datetime="2015-06-12T15:12:26.000Z" itemprop="datePublished">2015-06-12</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/机器学习/">机器学习</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <p>非负矩阵分解能够学习到对象的局部特征，例如把人脸分解成嘴巴，眼睛，鼻子等等不同的部分，在很多领域都有重要的应用，例如文本聚类，语音处理，协同过滤。其主要思想是把一个大的非负矩阵X分解为两个小矩阵（WH）的乘积，满足这两个小矩阵所有元素都不为负值的条件，即X=WH。然而完全相等很难实现，所以我们只要求能够充分接近就可以了。这时需要一个代价函数（cost function）来表示两者的差距。一种代价函数是基于欧式距离的，一种是分离度的，两个都有对应的迭代公式。  <a id="more"></a><br>介绍NMF算法的文章已经有很多了，本文主要介绍一下非负矩阵分解在分析癌症突变异质性中的作用。数据来自于nature论文 ——Mutational heterogeneity in cancer and the search for new cancer-associated genes ——的附表S3，是对2892个癌症病人的96中突变类型的统计。论文分析的是3083个癌症病人的数据，而附表S3只提供了突变个数在10个以上的数据，只有2892个病人，因此不求能够得到和论文完全一致的结果。现在的数据是每个癌症样本在96种突变类型上的分布，通过非负矩阵分解，我们期望得到每个样本在不同的突变谱上的分布，所谓突变谱就是把几个突变类型综合在一起的形式，例如*CpG岛处的突变代表了一些C参与的突变类型。下图为论文中找到的6个突变谱，包含了目前已知的突变过程。</p>
+<div class="justified-gallery"><img src="/img/legoplot-paper.jpg" alt="legoplot-paper"></div><br>数据归一化：某个样本的某种类型的突变可能是由于这种类型的突变的测序覆盖度比较好导致的，因此需要对每种突变类型进行归一化处理。对每个样本s和突变类型c，定义\({n_{cs}}\)为观察到的突变数，\({N_{cs}}\)为具有足够覆盖度碱基数，则样本总的突变频率为$\mu _s=\sum _c{n_{cs}} / \sum _c{N_{cs}}$，每种突变的相对突变率$R_{cs}=(n_{cs}/N_{cs})/\mu_s$，接着可以对$R_{cs}$矩阵进行非负矩阵分解。论文中并没有提供每个样本的每种突变类型的碱基数，只给了所有样本的平均值，所以这次计算用了这种并不合适的数据。<br>R code:<br><figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">coverage &lt;- read.table(<span class="string">'coverage.txt'</span>,header=<span class="literal">F</span>)[-<span class="number">1</span>]  </div><div class="line">mutation &lt;- read.csv(<span class="string">'table_s3.csv'</span>,header=<span class="literal">TRUE</span>, row.names=<span class="string">'name'</span>,stringsAsFactors=<span class="literal">FALSE</span>)  </div><div class="line">mutation.spe &lt;- as.matrix(mutation[,<span class="number">2</span>:<span class="number">97</span>])  </div><div class="line">mutation.spectrum &lt;- matrix(<span class="number">0</span>,nrow=<span class="number">2892</span>,ncol=<span class="number">96</span>,dimnames=dimnames(mutation.spe))  </div><div class="line">samlength=rep(<span class="number">0</span>,<span class="number">2892</span>)  </div><div class="line"><span class="keyword">for</span> (i <span class="keyword">in</span> <span class="number">1</span>:nrow(mutation.spe))&#123;  </div><div class="line">  mius=sum(mutation.spe[i,])/sum(coverage)  </div><div class="line">  samlength[i]=mius*<span class="number">1000000</span>  </div><div class="line">  mutation.spectrum[i,]=as.matrix((mutation.spe[i,]/coverage)/mius)  </div><div class="line">&#125;</div></pre></td></tr></table></figure><br><br>使用R包NMF进行矩阵分解，rank=6，nrun=50<br><figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">library</span>(NMF)</div><div class="line">spectrum.fit &lt;- nmf(mutation.spectrum, <span class="number">6</span>, nrun=<span class="number">50</span>)</div><div class="line">spectrum.coef &lt;- coef(spectrum.fit)</div><div class="line"><span class="comment">#spectrum.basis &lt;- t(spectrum.basis)</span></div><div class="line"></div><div class="line">basematrix &lt;- <span class="keyword">function</span>(factor,base1,base2)&#123;</div><div class="line">  base &lt;- rep(<span class="number">0</span>,<span class="number">16</span>)</div><div class="line">  index=<span class="number">1</span></div><div class="line">  <span class="keyword">for</span> (i <span class="keyword">in</span> c(<span class="string">'T'</span>,<span class="string">'C'</span>,<span class="string">'A'</span>,<span class="string">'G'</span>))&#123;</div><div class="line">    <span class="keyword">for</span> (j <span class="keyword">in</span> c(<span class="string">'T'</span>,<span class="string">'C'</span>,<span class="string">'A'</span>,<span class="string">'G'</span>))&#123;</div><div class="line">      name=paste0(i,base1,j,<span class="string">'to'</span>,i,base2,j)</div><div class="line">      base[index]=factor[name]</div><div class="line">      index=index+<span class="number">1</span></div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">  <span class="keyword">return</span>(matrix(base,nrow=<span class="number">4</span>,byrow=<span class="literal">T</span>))     </div><div class="line">&#125;</div><div class="line"></div><div class="line">combinebase &lt;- <span class="keyword">function</span>(index)&#123;</div><div class="line">  CG = basematrix(spectrum.coef[index,],<span class="string">'C'</span>,<span class="string">'G'</span>)</div><div class="line">  CA = basematrix(spectrum.coef[index,],<span class="string">'C'</span>,<span class="string">'A'</span>)</div><div class="line">  CT = basematrix(spectrum.coef[index,],<span class="string">'C'</span>,<span class="string">'T'</span>)</div><div class="line">  AT = basematrix(spectrum.coef[index,],<span class="string">'A'</span>,<span class="string">'T'</span>)</div><div class="line">  AC = basematrix(spectrum.coef[index,],<span class="string">'A'</span>,<span class="string">'C'</span>)</div><div class="line">  AG = basematrix(spectrum.coef[index,],<span class="string">'A'</span>,<span class="string">'G'</span>)</div><div class="line">  <span class="keyword">return</span>(cbind(rbind(CG,AT),rbind(CA,AC),rbind(CT,AG)))</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line">par(mfrow=c(<span class="number">2</span>,<span class="number">3</span>),mar=c(<span class="number">2</span>,<span class="number">1</span>,<span class="number">1</span>,<span class="number">2</span>))</div><div class="line"></div><div class="line"><span class="comment">#plot</span></div><div class="line"><span class="keyword">for</span> (i <span class="keyword">in</span> <span class="number">1</span>:<span class="number">6</span>)&#123;</div><div class="line">  data = combinebase(i)</div><div class="line">  </div><div class="line">  data=data/max(data)</div><div class="line">  </div><div class="line">  <span class="comment"># generate 'empty' persp plot</span></div><div class="line">  pmat = persp(x=c(<span class="number">0</span>,<span class="number">10</span>), y=c(<span class="number">0</span>,<span class="number">10</span>), z=matrix(c(<span class="number">0</span>,<span class="number">.001</span>,<span class="number">0</span>,<span class="number">.001</span>), nrow=<span class="number">2</span>), </div><div class="line">               xlim=c(<span class="number">0</span>,<span class="number">10</span>), ylim=c(<span class="number">0</span>,<span class="number">10</span>), zlim=c(<span class="number">0</span>,<span class="number">1.5</span>), </div><div class="line">               theta=<span class="number">60</span>, phi=<span class="number">25</span>, d=<span class="number">5</span>, box=<span class="literal">F</span>,border=<span class="literal">NA</span>) </div><div class="line">  </div><div class="line">  <span class="comment"># define color ramp</span></div><div class="line">  colorCG = matrix(rep(<span class="string">'#FF0000'</span>,<span class="number">16</span>),nrow=<span class="number">4</span>)</div><div class="line">  colorAT = matrix(rep(<span class="string">'#7F4CB2'</span>,<span class="number">16</span>),nrow=<span class="number">4</span>)</div><div class="line">  colorCA = matrix(rep(<span class="string">'#00B2B2'</span>,<span class="number">16</span>),nrow=<span class="number">4</span>)</div><div class="line">  colorAC = matrix(rep(<span class="string">'#0033CC'</span>,<span class="number">16</span>),nrow=<span class="number">4</span>)</div><div class="line">  colorCT = matrix(rep(<span class="string">'#FFFF00'</span>,<span class="number">16</span>),nrow=<span class="number">4</span>)</div><div class="line">  colorAG = matrix(rep(<span class="string">'#19CC19'</span>,<span class="number">16</span>),nrow=<span class="number">4</span>)</div><div class="line">  </div><div class="line">  colorM = cbind(rbind(colorCG,colorAT),rbind(colorCA,colorAC),rbind(colorCT,colorAG))</div><div class="line">  </div><div class="line">  <span class="comment"># draw each bar: from left to right ...</span></div><div class="line">  <span class="keyword">for</span> (i <span class="keyword">in</span> <span class="number">1</span>:nrow(data))&#123;</div><div class="line">    </div><div class="line">    <span class="comment"># ... and back to front </span></div><div class="line">    <span class="keyword">for</span> (j <span class="keyword">in</span> ncol(data):<span class="number">1</span>)&#123;</div><div class="line">      </div><div class="line">      xy = which(data == data[i,j], arr.ind=<span class="literal">TRUE</span>)</div><div class="line">      </div><div class="line">      <span class="comment"># side facing y</span></div><div class="line">      x = rep(xy[<span class="number">1</span>]-<span class="number">0.1</span>,<span class="number">4</span>)</div><div class="line">      y = c(xy[<span class="number">2</span>]-<span class="number">0.9</span>,xy[<span class="number">2</span>]-<span class="number">0.1</span>,xy[<span class="number">2</span>]-<span class="number">0.1</span>,xy[<span class="number">2</span>]-<span class="number">0.9</span>)</div><div class="line">      z = c(<span class="number">0</span>,<span class="number">0</span>,data[i,j],data[i,j])</div><div class="line">      polygon(trans3d(x, y, z, pmat), col=colorM[i,j], border=<span class="number">1</span>)</div><div class="line">      </div><div class="line">      <span class="comment">#  side facing x</span></div><div class="line">      x = c(xy[<span class="number">1</span>]-<span class="number">0.9</span>,xy[<span class="number">1</span>]-<span class="number">0.1</span>,xy[<span class="number">1</span>]-<span class="number">0.1</span>,xy[<span class="number">1</span>]-<span class="number">0.9</span>)</div><div class="line">      y = rep(xy[<span class="number">2</span>]-<span class="number">0.9</span>,<span class="number">4</span>)</div><div class="line">      z = c(<span class="number">0</span>,<span class="number">0</span>,data[i,j],data[i,j])</div><div class="line">      polygon(trans3d(x, y, z, pmat), col=colorM[i,j], border=<span class="number">1</span>)</div><div class="line">      </div><div class="line">      <span class="comment"># top side</span></div><div class="line">      x = c(xy[<span class="number">1</span>]-<span class="number">0.9</span>,xy[<span class="number">1</span>]-<span class="number">0.1</span>,xy[<span class="number">1</span>]-<span class="number">0.1</span>,xy[<span class="number">1</span>]-<span class="number">0.9</span>)</div><div class="line">      y = c(xy[<span class="number">2</span>]-<span class="number">0.9</span>,xy[<span class="number">2</span>]-<span class="number">0.9</span>,xy[<span class="number">2</span>]-<span class="number">0.1</span>,xy[<span class="number">2</span>]-<span class="number">0.1</span>)</div><div class="line">      z = rep(data[i,j],<span class="number">4</span>)</div><div class="line">      polygon(trans3d(x, y, z, pmat), col=colorM[i,j], border=<span class="number">1</span>)</div><div class="line">      </div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure><br><br><div class="justified-gallery"><img src="/img/legoplot.png" alt="legoplot"></div>
+
+<p>从上图可以看出算法找到的突变谱分别为Tp*C-&gt;mut, Tp*A-&gt;T, C-&gt;A, misc, misc, *CpG-&gt;T。最后查看每种类型的癌症在这六种突变谱上的分布，即确认是否有的癌症只具有一种突变谱还是多种，可以通过绘制热图来查看。这里使用论文的可视化方法，通过绘制径向图查看。R绘图包plotrix中的radial.plot函数需要提供两个参数，即径向的长度和角度（以弧度为单位）。这里用每个样本的总突变率为长度。对于每个样本s，使$i_{sr}$表示在六个突变谱中第r-th个最大的权重，角度可以通过这个公式计算$\alpha_s=2\pi\sum _{r=0}^K{i_r(1/K)^r}$。第一个最大的权重决定样本在整个圆周的哪个扇区，第二大权重决定在上个扇区中的小扇区，以此推导。<br>R code:<br><figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div></pre></td><td class="code"><pre><div class="line">spectrum.sample &lt;- basis(spectrum.fit)</div><div class="line">samlength=rep(<span class="number">0</span>,<span class="number">2892</span>)</div><div class="line">radial=rep(<span class="number">0</span>,<span class="number">2892</span>)</div><div class="line"><span class="keyword">for</span> (i <span class="keyword">in</span> <span class="number">1</span>:<span class="number">2892</span>)&#123;</div><div class="line">  ir=order(spectrum.sample[i,<span class="number">1</span>:<span class="number">6</span>],decreasing = <span class="literal">T</span>)</div><div class="line">  radial[i]=<span class="number">2</span>*pi*sum(ir*(<span class="number">1</span>/<span class="number">6</span>)**(<span class="number">1</span>:<span class="number">6</span>))</div><div class="line">&#125;</div><div class="line">colorlist &lt;- list(<span class="string">'AML'</span>=<span class="string">'#12A6DA'</span>,<span class="string">'Bladder'</span>=<span class="string">'#E5E515'</span>,<span class="string">'Breast'</span>=<span class="string">'#F37F81'</span>,<span class="string">'CLL'</span>=<span class="string">'#A94399'</span>,<span class="string">'Colorectal'</span>=<span class="string">'#0F9B5A'</span>,</div><div class="line"><span class="string">'Carcinoid'</span>=<span class="string">'#6F2011'</span>,<span class="string">'Cervical'</span>=<span class="string">'#F58020'</span>,<span class="string">'DLBCL'</span>=<span class="string">'#2C2C81'</span>,</div><div class="line"><span class="string">'Oesophageal adenocarcinoma'</span>=<span class="string">'#5DBB46'</span>,<span class="string">'Ewing sarcoma'</span>=<span class="string">'#664182'</span>,</div><div class="line"><span class="string">'Glioblastoma multiforme'</span>=<span class="string">'#8B715D'</span>,<span class="string">'Head and neck'</span>=<span class="string">'#364EA1'</span>,</div><div class="line"><span class="string">'Kidney clear cell'</span>=<span class="string">'#543C1C'</span>,<span class="string">'Kidney papillary cell'</span>=<span class="string">'#302636'</span>,<span class="string">'Low-grade glioma'</span>=<span class="string">'#8D5967'</span>,</div><div class="line"><span class="string">'Lung adenocarcinoma'</span>=<span class="string">'#B12124'</span>,<span class="string">'Lung squamous cell carcinoma'</span>=<span class="string">'#ED1F24'</span>,</div><div class="line"><span class="string">'Multiple myeloma'</span>=<span class="string">'#808233'</span>,<span class="string">'Medulloblastoma'</span>=<span class="string">'#16304A'</span>,<span class="string">'Melanoma'</span>=<span class="string">'#231F20'</span>,</div><div class="line"><span class="string">'Neuroblastoma'</span>=<span class="string">'#39276B'</span>,<span class="string">'Ovarian'</span>=<span class="string">'#CC80B4'</span>,<span class="string">'Pancreas'</span>=<span class="string">'#543C1C'</span>,<span class="string">'Prostate'</span>=<span class="string">'#B3B48C'</span>,</div><div class="line"><span class="string">'Rhabdoid tumor'</span>=<span class="string">'#9999A6'</span>,<span class="string">'Stomach'</span>=<span class="string">'#69BD45'</span>,<span class="string">'Thyroid'</span>=<span class="string">'#A1A6D2'</span>)</div><div class="line">tumor_type=table(mutation[,<span class="number">1</span>])</div><div class="line">collevel=rep(<span class="string">''</span>,<span class="number">27</span>)</div><div class="line"><span class="keyword">for</span> (i <span class="keyword">in</span> <span class="number">1</span>:length(colorlist))&#123;</div><div class="line">  collevel[i]=colorlist[[i]]</div><div class="line">&#125;</div><div class="line">colorpoint=rep(<span class="string">''</span>,<span class="number">2892</span>)</div><div class="line">loc=<span class="number">1</span></div><div class="line"><span class="keyword">for</span> (i <span class="keyword">in</span> <span class="number">1</span>:<span class="number">27</span>)&#123;</div><div class="line">  <span class="comment">#tumor=names(tumor_type[i])</span></div><div class="line">  colorpoint[loc:(loc+tumor_type[i]-<span class="number">1</span>)]=rep(colorlist[[i]],tumor_type[i])</div><div class="line">  loc=loc+tumor_type[i]</div><div class="line">&#125;</div><div class="line"><span class="keyword">library</span>(plotrix)</div><div class="line">radial.plot(log(samlength,<span class="number">10</span>),radial,rp.type=<span class="string">"s"</span>,point.col=colorpoint,point.symbols=<span class="number">20</span>,</div><div class="line">            show.grid=<span class="literal">T</span>,grid.col=<span class="string">"white"</span>,show.grid.labels=<span class="number">0</span>,</div><div class="line">            radial.lim=c(log10(<span class="number">0.04</span>),log10(<span class="number">100</span>)),</div><div class="line">            label.pos=c(pi/<span class="number">2</span>,<span class="number">5</span>*pi/<span class="number">6</span>,<span class="number">7</span>*pi/<span class="number">6</span>,<span class="number">3</span>*pi/<span class="number">2</span>,<span class="number">11</span>*pi/<span class="number">6</span>,pi/<span class="number">6</span>),</div><div class="line">            labels=c(<span class="string">'Tp*C-&gt;mut'</span>,<span class="string">'Tp*A-&gt;T'</span>,<span class="string">'C-&gt;A'</span>,<span class="string">'misc'</span>,<span class="string">'misc'</span>,<span class="string">'*CpG-&gt;T'</span>))</div><div class="line">radial.plot(rep(<span class="number">2</span>,<span class="number">6</span>),c(<span class="number">0</span>,pi/<span class="number">3</span>,pi*<span class="number">2</span>/<span class="number">3</span>,pi,pi*<span class="number">4</span>/<span class="number">3</span>,pi*<span class="number">5</span>/<span class="number">3</span>),rp.type=<span class="string">'r'</span>,</div><div class="line">            line.col = <span class="string">'grey'</span>,lwd=<span class="number">2</span>,add=<span class="literal">T</span>,radial.lim=c(log10(<span class="number">0.04</span>),log10(<span class="number">100</span>)))</div></pre></td></tr></table></figure></p>
+<p><div class="justified-gallery"><img src="/img/radial plot.png" alt="radial plot"></div><br>下面绘制图例<br><figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">plot(<span class="number">1</span>:<span class="number">30</span>,<span class="number">1</span>:<span class="number">30</span>,bty=<span class="string">'n'</span>,type=<span class="string">'n'</span>,xaxt=<span class="string">'n'</span>,yaxt=<span class="string">'n'</span>,xlab=<span class="string">''</span>,ylab=<span class="string">''</span>)</div><div class="line">legend(<span class="number">1</span>,<span class="number">27</span>,names(colorlist)[<span class="number">1</span>:<span class="number">14</span>],col=collevel[<span class="number">1</span>:<span class="number">14</span>],pch=<span class="number">19</span>,pt.cex=<span class="number">1.5</span>,bty=<span class="string">'n'</span>)</div><div class="line">legend(<span class="number">18</span>,<span class="number">27</span>,names(colorlist)[<span class="number">15</span>:<span class="number">27</span>],col=collevel[<span class="number">15</span>:<span class="number">27</span>],pch=<span class="number">19</span>,pt.cex=<span class="number">1.5</span>,bty=<span class="string">'n'</span>)</div></pre></td></tr></table></figure></p>
+<p><div class="justified-gallery"><img src="/img/legend.png" alt="legend"></div><br>从图中可以看到一些有意义的结果，例如AML主要分布在Tp*A-&gt;T的突变，而肺癌主要是C-&gt;A的突变。然后由于数据不完整，归一化做的比较，最终得到的结果也不是太好，并没有很好地解释癌症突变谱异质性。</p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="http://mtpgm.com/2015/06/12/nmf/" data-id="cixcb45470008ykiorf4hggxp" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+        <a href="http://mtpgm.com/2015/06/12/nmf/#comments" class="article-comment-link ds-thread-count" data-thread-key="http://mtpgm.com/2015/06/12/nmf/">Comments</a>
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+        <a href="/2015/06/16/measure/" id="article-nav-newer" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">Newer</strong>
+            <div class="article-nav-title">
+                
+                    测度论（一）
+                
+            </div>
+        </a>
+    
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    <section id="comments">
+    
+        
+    <div class="ds-thread" data-thread-key="2015/06/12/nmf/" data-title="非负矩阵分解（NMF）" data-url="http://mtpgm.com/2015/06/12/nmf/"></div>
+    <style>
+        #ds-thread #ds-reset .ds-textarea-wrapper {
+            background: none;
+        }
+        #ds-reset .ds-avatar img {
+            box-shadow: none;
+        }
+        #ds-reset .ds-gradient-bg {
+            background: #f7f7f7;
+        }
+        #ds-thread #ds-reset li.ds-tab a {
+            border-radius: 3px;
+        }
+        #ds-thread #ds-reset .ds-post-button {
+            color: white;
+            border: none;
+            box-shadow: none;
+            background: #d32;
+            text-shadow: none;
+            font-weight: normal;
+            font-family: 'Microsoft Yahei';
+        }
+        #ds-thread #ds-reset .ds-post-button:hover {
+            color: white;
+            background: #DE594C;
+        }
+        #ds-thread #ds-reset .ds-post-button:active {
+            background: #d32;
+        }
+        #ds-smilies-tooltip ul.ds-smilies-tabs li a.ds-current {
+            color: white;
+            background: #d32;
+            box-shadow: none;
+            text-shadow: none;
+            font-weight: normal;
+        }
+    </style>
+
+    
+    </section>
+
+</section>
+            
+                <aside id="sidebar">
+   
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">recent</h3>
+        <div class="widget">
+            <ul id="recent-post" class="">
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2016/12/27/activityflow/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2016/12/27/activityflow/" class="title">activityflow</a></p>
+                            <p class="item-date"><time datetime="2016-12-26T16:28:07.000Z" itemprop="datePublished">2016-12-27</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2016/12/18/Cplus-programming/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2016/12/18/Cplus-programming/" class="title">C++程序设计</a></p>
+                            <p class="item-date"><time datetime="2016-12-18T08:07:56.000Z" itemprop="datePublished">2016-12-18</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2016/12/17/C-programming/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2016/12/17/C-programming/" class="title">C语言学习</a></p>
+                            <p class="item-date"><time datetime="2016-12-17T10:40:08.000Z" itemprop="datePublished">2016-12-17</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2015/08/17/t-sne/" class="thumbnail">
+    
+    
+        <span style="background-image:url(/img/digits_tsne-generated.png)" alt="t-SNE:高维数据可视化" class="thumbnail-image"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2015/08/17/t-sne/" class="title">t-SNE:高维数据可视化</a></p>
+                            <p class="item-date"><time datetime="2015-08-17T14:26:30.000Z" itemprop="datePublished">2015-08-17</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2015/08/14/lle/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2015/08/14/lle/" class="title">非线性维度下降之局部线性插值</a></p>
+                            <p class="item-date"><time datetime="2015-08-14T01:18:41.000Z" itemprop="datePublished">2015-08-14</time></p>
+                        </div>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+    
+        
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">archives</h3>
+        <div class="widget">
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/08/">August 2015</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">July 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">June 2015</a><span class="archive-list-count">2</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">tags</h3>
+        <div class="widget">
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/C-C/">C/C++</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/data-visualization/">data visualization</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/neuroimaging/">neuroimaging</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/数据挖掘/">数据挖掘</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/机器学习/">机器学习</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/测度论/">测度论</a><span class="tag-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">tag cloud</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/C-C/" style="font-size: 20px;">C/C++</a> <a href="/tags/data-visualization/" style="font-size: 10px;">data visualization</a> <a href="/tags/neuroimaging/" style="font-size: 10px;">neuroimaging</a> <a href="/tags/数据挖掘/" style="font-size: 10px;">数据挖掘</a> <a href="/tags/机器学习/" style="font-size: 20px;">机器学习</a> <a href="/tags/测度论/" style="font-size: 10px;">测度论</a>
+        </div>
+    </div>
+
+    
+    <div id="toTop" class="fa fa-angle-up"></div>
+</aside>
+            
+        </div>
+        <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2016 mtpgm<br>
+        </div>
+    </div>
+</footer>
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+        
+    
+    <script type="text/javascript">
+    var duoshuoQuery = {short_name:'true'};
+    (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0]
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+    </script>
+
+
+
+    
+        <script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-share.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-video.min.js"></script>
+    
+    
+        <script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+    
+
+
+
+<!-- Custom Scripts -->
+<script src="/js/main.js"></script>
+
+    </div>
+</body>
+</html>

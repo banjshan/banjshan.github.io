@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <meta charset="utf-8">
+    
+    <title>t-SNE:高维数据可视化 | Data Miner</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="t-SNE，即t-distributed stochastic neighbor embedding，也是一种流体学习方法（manifold learning），通过保持数据点的相邻关系把数据从高维空间中降低到2维平面上，对高维数据可视化的效果非常好。本文使用python的机器学习包sklearn来对这个算法进行简单的介绍。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="t-SNE:高维数据可视化">
+<meta property="og:url" content="http://mtpgm.com/2015/08/17/t-sne/index.html">
+<meta property="og:site_name" content="Data Miner">
+<meta property="og:description" content="t-SNE，即t-distributed stochastic neighbor embedding，也是一种流体学习方法（manifold learning），通过保持数据点的相邻关系把数据从高维空间中降低到2维平面上，对高维数据可视化的效果非常好。本文使用python的机器学习包sklearn来对这个算法进行简单的介绍。">
+<meta property="og:image" content="http://mtpgm.com/img/digits_tsne-generated.png">
+<meta property="og:updated_time" content="2016-12-30T19:36:35.709Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="t-SNE:高维数据可视化">
+<meta name="twitter:description" content="t-SNE，即t-distributed stochastic neighbor embedding，也是一种流体学习方法（manifold learning），通过保持数据点的相邻关系把数据从高维空间中降低到2维平面上，对高维数据可视化的效果非常好。本文使用python的机器学习包sklearn来对这个算法进行简单的介绍。">
+<meta name="twitter:image" content="http://mtpgm.com/img/digits_tsne-generated.png">
+    
+
+    
+        <link rel="alternate" href="/" title="Data Miner" type="application/atom+xml" />
+    
+
+    
+        <link rel="icon" href="/css/images/zhaoqiao.ico" />
+    
+
+    <link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/libs/open-sans/styles.css">
+    <link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+    <link rel="stylesheet" href="/css/style.css">
+
+    <script src="/libs/jquery/2.1.3/jquery.min.js"></script>
+    
+    
+        <link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+    
+    
+        <link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+    
+    
+    
+    
+        <script>
+var _hmt = _hmt || [];
+(function() {
+    var hm = document.createElement("script");
+    hm.src = "//hm.baidu.com/hm.js?true";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+    
+
+
+	<!-- syntaxhighlighter -->
+	<script type="text/javascript" src="/js/shCore.js"></script>
+	<link type="text/css" rel="stylesheet" href="/js/shCore.css"/>
+	<link type="text/css" rel="stylesheet" href="/js/shThemeDefault.css"/>
+	<script type="text/javascript" src="/js/shBrushCpp.js"></script>
+	<script type="text/javascript" src="/js/shBrushPython.js"></script>
+	<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/" id="logo">
+                <i class="logo"></i>
+                <span class="site-title">Data Miner</span>
+            </a>
+            <nav id="main-nav">
+                
+                    <a class="main-nav-link" href="/.">Home</a>
+                
+                    <a class="main-nav-link" href="/archives">Archives</a>
+                
+            </nav>
+            
+                
+                <nav id="sub-nav">
+                    <div class="profile" id="profile-nav">
+                        <a id="profile-anchor" href="javascript:;">
+                            <img class="avatar" src="/css/images/qimu.png" />
+                            <i class="fa fa-caret-down"></i>
+                        </a>
+                    </div>
+                </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="Search" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="Type something..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: 'Posts',
+            PAGES: 'Pages',
+            CATEGORIES: 'Categories',
+            TAGS: 'Tags',
+            UNTITLED: '(Untitled)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/.">Home</a></td>
+                
+                    <td><a class="main-nav-link" href="/archives">Archives</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="Search" />
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+                
+
+<aside id="profile">
+    <div class="inner profile-inner">
+        <div class="base-info profile-block">
+            <img id="avatar" src="/css/images/qimu.png" />
+            <h2 id="name">bjshan</h2>
+            <h3 id="title">Algorithm Engineer</h3>
+            <span id="location"><i class="fa fa-map-marker"></i>Beijing, China</span>
+            <a id="follow" target="_blank" href="https://github.com/banjshan/">FOLLOW</a>
+        </div>
+        <div class="article-info profile-block">
+            <div class="article-info-block">
+                8
+                <span>posts</span>
+            </div>
+            <div class="article-info-block">
+                6
+                <span>tags</span>
+            </div>
+        </div>
+        
+        <div class="profile-block social-links">
+            <table>
+                <tr>
+                    
+                    
+                    <td>
+                        <a href="http://github.com/banjshan/" target="_blank" title="github" class=tooltip>
+                            <i class="fa fa-github"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="twitter" class=tooltip>
+                            <i class="fa fa-twitter"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="facebook" class=tooltip>
+                            <i class="fa fa-facebook"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="dribbble" class=tooltip>
+                            <i class="fa fa-dribbble"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="rss" class=tooltip>
+                            <i class="fa fa-rss"></i>
+                        </a>
+                    </td>
+                    
+                </tr>
+            </table>
+        </div>
+        
+    </div>
+</aside>
+
+            
+            <section id="main"><article id="post-t-sne" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+            
+	
+		<img src="/img/digits_tsne-generated.png" class="article-banner" />
+	
+
+
+
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+            t-SNE:高维数据可视化
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2015/08/17/t-sne/">
+            <time datetime="2015-08-17T14:26:30.000Z" itemprop="datePublished">2015-08-17</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/data-visualization/">data visualization</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <p>t-SNE，即t-distributed stochastic neighbor embedding，也是一种流体学习方法（manifold learning），通过保持数据点的相邻关系把数据从高维空间中降低到2维平面上，对高维数据可视化的效果非常好。本文使用python的机器学习包sklearn来对这个算法进行简单的介绍。<a id="more"></a>导入所需要的包，<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># That's an impressive list of imports.</span></div><div class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</div><div class="line"><span class="keyword">from</span> numpy <span class="keyword">import</span> linalg</div><div class="line"><span class="keyword">from</span> numpy.linalg <span class="keyword">import</span> norm</div><div class="line"><span class="keyword">from</span> scipy.spatial.distance <span class="keyword">import</span> squareform, pdist</div><div class="line"></div><div class="line"><span class="comment"># We import sklearn.</span></div><div class="line"><span class="keyword">import</span> sklearn</div><div class="line"><span class="keyword">from</span> sklearn.manifold <span class="keyword">import</span> TSNE</div><div class="line"><span class="keyword">from</span> sklearn.datasets <span class="keyword">import</span> load_digits</div><div class="line"><span class="keyword">from</span> sklearn.preprocessing <span class="keyword">import</span> scale</div><div class="line"></div><div class="line"><span class="comment"># We'll hack a bit with the t-SNE code in sklearn 0.15.2.</span></div><div class="line"><span class="keyword">from</span> sklearn.metrics.pairwise <span class="keyword">import</span> pairwise_distances</div><div class="line"><span class="keyword">from</span> sklearn.manifold.t_sne <span class="keyword">import</span> (_joint_probabilities,</div><div class="line">                                    _kl_divergence)</div><div class="line"><span class="keyword">from</span> sklearn.utils.extmath <span class="keyword">import</span> _ravel</div><div class="line"><span class="comment"># Random state.</span></div><div class="line">RS = <span class="number">20150101</span></div><div class="line"></div><div class="line"><span class="comment"># We'll use matplotlib for graphics.</span></div><div class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</div><div class="line"><span class="keyword">import</span> matplotlib.patheffects <span class="keyword">as</span> PathEffects</div><div class="line"></div><div class="line"><span class="comment"># We import seaborn to make nice plots.</span></div><div class="line"><span class="keyword">import</span> seaborn <span class="keyword">as</span> sns</div><div class="line">sns.set_style(<span class="string">'darkgrid'</span>)</div><div class="line">sns.set_palette(<span class="string">'muted'</span>)</div><div class="line">sns.set_context(<span class="string">"notebook"</span>, font_scale=<span class="number">1.5</span>,</div><div class="line">                rc=&#123;<span class="string">"lines.linewidth"</span>: <span class="number">2.5</span>&#125;)</div><div class="line"></div><div class="line"><span class="comment"># We'll generate an animation with matplotlib and moviepy.</span></div><div class="line"><span class="keyword">from</span> moviepy.video.io.bindings <span class="keyword">import</span> mplfig_to_npimage</div><div class="line"><span class="keyword">import</span> moviepy.editor <span class="keyword">as</span> mpy</div></pre></td></tr></table></figure></p>
+<p>首先介绍一个可视化手写字体的例子。数据使用sklearn包里面带的一个数据集，共有1797张手写字体的图片，每张图片的像素为8*8=64。<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">digits = load_digits()</div><div class="line">print(digits.shape)   <span class="comment">#1797, 64</span></div><div class="line">print(digits[<span class="string">'DESCR'</span>])</div><div class="line">nrows, ncols = <span class="number">2</span>, <span class="number">5</span></div><div class="line">plt.figure(figsize=(<span class="number">6</span>,<span class="number">3</span>))</div><div class="line">plt.gray()</div><div class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(ncols * nrows):</div><div class="line">    ax = plt.subplot(nrows, ncols, i + <span class="number">1</span>)</div><div class="line">    ax.matshow(digits.images[i,...])</div><div class="line">    plt.xticks([]); plt.yticks([])</div><div class="line">    plt.title(digits.target[i])</div><div class="line">plt.savefig(<span class="string">'digits-generated.png'</span>, dpi=<span class="number">150</span>)</div></pre></td></tr></table></figure></p>
+<p><img src="/img/digits-generated.png" alt="digits"><br>接着运行t-SNE算法<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># We first reorder the data points according to the handwritten numbers.</span></div><div class="line">X = np.vstack([digits.data[digits.target==i]</div><div class="line">               <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">10</span>)])</div><div class="line">y = np.hstack([digits.target[digits.target==i]</div><div class="line">               <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">10</span>)])</div><div class="line">digits_proj = TSNE(random_state=RS).fit_transform(X)</div></pre></td></tr></table></figure></p>
+<p>写绘图函数，用转换后的数据点绘图。<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">scatter</span><span class="params">(x, colors)</span>:</span></div><div class="line">    <span class="comment"># We choose a color palette with seaborn.</span></div><div class="line">    palette = np.array(sns.color_palette(<span class="string">"hls"</span>, <span class="number">10</span>))</div><div class="line"></div><div class="line">    <span class="comment"># We create a scatter plot.</span></div><div class="line">    f = plt.figure(figsize=(<span class="number">8</span>, <span class="number">8</span>))</div><div class="line">    ax = plt.subplot(aspect=<span class="string">'equal'</span>)</div><div class="line">    sc = ax.scatter(x[:,<span class="number">0</span>], x[:,<span class="number">1</span>], lw=<span class="number">0</span>, s=<span class="number">40</span>,</div><div class="line">                    c=palette[colors.astype(np.int)])</div><div class="line">    plt.xlim(<span class="number">-25</span>, <span class="number">25</span>)</div><div class="line">    plt.ylim(<span class="number">-25</span>, <span class="number">25</span>)</div><div class="line">    ax.axis(<span class="string">'off'</span>)</div><div class="line">    ax.axis(<span class="string">'tight'</span>)</div><div class="line"></div><div class="line">    <span class="comment"># We add the labels for each digit.</span></div><div class="line">    txts = []</div><div class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">10</span>):</div><div class="line">        <span class="comment"># Position of each label.</span></div><div class="line">        xtext, ytext = np.median(x[colors == i, :], axis=<span class="number">0</span>)</div><div class="line">        txt = ax.text(xtext, ytext, str(i), fontsize=<span class="number">24</span>)</div><div class="line">        txt.set_path_effects([</div><div class="line">            PathEffects.Stroke(linewidth=<span class="number">5</span>, foreground=<span class="string">"w"</span>),</div><div class="line">            PathEffects.Normal()])</div><div class="line">        txts.append(txt)</div><div class="line"></div><div class="line">    <span class="keyword">return</span> f, ax, sc, txts</div></pre></td></tr></table></figure></p>
+<p>展示结果，可以看到不同数字被分成了不同的簇。<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">scatter(digits_proj, y)</div><div class="line">plt.savefig(<span class="string">'images/digits_tsne-generated.png'</span>, dpi=<span class="number">120</span>)</div></pre></td></tr></table></figure></p>
+<p><img src="/img/digits_tsne-generated.png" alt="digits-tSNE"></p>
+<p>#算法原理<br>对每个数据点i，和每个潜在的邻居j，首先计算一个条件概率$p_{j|i}$，表示i选择j为邻居的概率：<br>$$p_{j|i}=\frac{exp(-||x_i-x_j||^2/2\sigma_i ^2)}{\sum_{k\neq i}exp(-||x_i-x_k||^2/2\sigma_i ^2)}$$<br>$\sigma_i$是以点$x_i$为中心的高斯分布的方差，是通过二分法找到的能使分布的熵等于$log(Perp)$，$Perp$是perplexity，用来衡量点$x_i$有效邻居的个数，值可以设置在5-50之间，是$\sigma_i$的单调函数。<br>$$Perp(P_i)=2^{H(P_i)} \ \ \ \ H(P_i)=-\sum_j p_{j|i}log_2 p_{j|i}$$<br>接着我们定义数据点间的相似性为对称的条件概率，<br>$$p_{ij}=\frac{p_{j|i}+p_{i|j}}{2N}$$</p>
+<p>#相似性矩阵（similarity matrix）<br>下面我们比较一下数据点的距离矩阵，$\sigma$为常量的相似性矩阵和$\sigma$为变量时的相似性矩阵。<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">_joint_probabilities_constant_sigma</span><span class="params">(D, sigma)</span>:</span></div><div class="line">    P = np.exp(-D**<span class="number">2</span>/<span class="number">2</span> * sigma**<span class="number">2</span>)</div><div class="line">    P /= np.sum(P, axis=<span class="number">1</span>)</div><div class="line">    <span class="keyword">return</span> P</div><div class="line"><span class="comment"># Pairwise distances between all data points.</span></div><div class="line">D = pairwise_distances(X, squared=<span class="keyword">True</span>)</div><div class="line"><span class="comment"># Similarity with constant sigma.</span></div><div class="line">P_constant = _joint_probabilities_constant_sigma(D, <span class="number">.002</span>)</div><div class="line"><span class="comment"># Similarity with variable sigma.</span></div><div class="line">P_binary = _joint_probabilities(D, <span class="number">30.</span>, <span class="keyword">False</span>)</div><div class="line"><span class="comment"># The output of this function needs to be reshaped to a square matrix.</span></div><div class="line">P_binary_s = squareform(P_binary)</div><div class="line"></div><div class="line">plt.figure(figsize=(<span class="number">12</span>, <span class="number">4</span>))</div><div class="line">pal = sns.light_palette(<span class="string">"blue"</span>, as_cmap=<span class="keyword">True</span>)</div><div class="line"></div><div class="line">plt.subplot(<span class="number">131</span>)</div><div class="line">plt.imshow(D[::<span class="number">10</span>, ::<span class="number">10</span>], interpolation=<span class="string">'none'</span>, cmap=pal)</div><div class="line">plt.axis(<span class="string">'off'</span>)</div><div class="line">plt.title(<span class="string">"Distance matrix"</span>, fontdict=&#123;<span class="string">'fontsize'</span>: <span class="number">16</span>&#125;)</div><div class="line"></div><div class="line">plt.subplot(<span class="number">132</span>)</div><div class="line">plt.imshow(P_constant[::<span class="number">10</span>, ::<span class="number">10</span>], interpolation=<span class="string">'none'</span>, cmap=pal)</div><div class="line">plt.axis(<span class="string">'off'</span>)</div><div class="line">plt.title(<span class="string">"$p_&#123;j|i&#125;$ (constant $\sigma$)"</span>, fontdict=&#123;<span class="string">'fontsize'</span>: <span class="number">16</span>&#125;)</div><div class="line"></div><div class="line">plt.subplot(<span class="number">133</span>)</div><div class="line">plt.imshow(P_binary_s[::<span class="number">10</span>, ::<span class="number">10</span>], interpolation=<span class="string">'none'</span>, cmap=pal)</div><div class="line">plt.axis(<span class="string">'off'</span>)</div><div class="line">plt.title(<span class="string">"$p_&#123;j|i&#125;$ (variable $\sigma$)"</span>, fontdict=&#123;<span class="string">'fontsize'</span>: <span class="number">16</span>&#125;)</div><div class="line">plt.savefig(<span class="string">'similarity-generated.png'</span>, dpi=<span class="number">120</span>)</div></pre></td></tr></table></figure></p>
+<p><img src="/img/similarity-generated.png" alt="similarity"><br>可以看到数据已经呈现出10组，分别对应10个数字。<br>现在使用1自由度的t-分布来定义低维空间数据点的相似性矩阵，<br>$$q_{ij}=\frac{(1+||y_i -y_j||^2)^{-1}}{\sum_{k\neq l}(1+||y_k-y_l||^2)^{-1}}$$<br>我们的目的是找到低维空间的一组坐标使得这两个分布尽可能相似，一个自然的度量就是这两个分布的Kullback-Leiber divergence:<br>$$C=KL(P||Q)=\sum _{i,j}p_{ij} \frac{p_{ij}}{q_{ij}}$$<br>我们使用梯度下降最小化这个得分，原始论文中有详细的求导过程，这里我们只写出结果：<br>$$\frac{\delta C}{\delta y_i}=4\sum _j (p_{ij}-q_{ij})(y_i -y_j)(1+||y_i -y_j||^2)^{-1}$$<br>这个公式有很好物理意义。$p_{ij}-q_{ij}$为正，说明$x_i$在高维空间和$x_j$相似度高，而低维空间相似度低，$x_i$将会靠近$x_j$，反之则会远离$x_j$。下面用一个动画来阐明这个过程。<br>首先monkey-patch sklearn包的t-SNE里面的_gradient_descent()函数，把每次迭代的结果保存下来。<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># This list will contain the positions of the map points at every iteration.</span></div><div class="line">positions = []</div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">_gradient_descent</span><span class="params">(objective, p0, it, n_iter, n_iter_without_progress=<span class="number">30</span>,</span></span></div><div class="line">                      momentum=<span class="number">0.5</span>, learning_rate=<span class="number">1000.0</span>, min_gain=<span class="number">0.01</span>,</div><div class="line">                      min_grad_norm=<span class="number">1e-7</span>, min_error_diff=<span class="number">1e-7</span>, verbose=<span class="number">0</span>,</div><div class="line">                      args=[]):</div><div class="line">    <span class="comment"># The documentation of this function can be found in scikit-learn's code.</span></div><div class="line">    p = p0.copy().ravel()</div><div class="line">    update = np.zeros_like(p)</div><div class="line">    gains = np.ones_like(p)</div><div class="line">    error = np.finfo(np.float).max</div><div class="line">    best_error = np.finfo(np.float).max</div><div class="line">    best_iter = <span class="number">0</span></div><div class="line"></div><div class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(it, n_iter):</div><div class="line">        <span class="comment"># We save the current position.</span></div><div class="line">        positions.append(p.copy())</div><div class="line"></div><div class="line">        new_error, grad = objective(p, *args)</div><div class="line">        error_diff = np.abs(new_error - error)</div><div class="line">        error = new_error</div><div class="line">        grad_norm = linalg.norm(grad)</div><div class="line"></div><div class="line">        <span class="keyword">if</span> error &lt; best_error:</div><div class="line">            best_error = error</div><div class="line">            best_iter = i</div><div class="line">        <span class="keyword">elif</span> i - best_iter &gt; n_iter_without_progress:</div><div class="line">            <span class="keyword">break</span></div><div class="line">        <span class="keyword">if</span> min_grad_norm &gt;= grad_norm:</div><div class="line">            <span class="keyword">break</span></div><div class="line">        <span class="keyword">if</span> min_error_diff &gt;= error_diff:</div><div class="line">            <span class="keyword">break</span></div><div class="line"></div><div class="line">        inc = update * grad &gt;= <span class="number">0.0</span></div><div class="line">        dec = np.invert(inc)</div><div class="line">        gains[inc] += <span class="number">0.05</span></div><div class="line">        gains[dec] *= <span class="number">0.95</span></div><div class="line">        np.clip(gains, min_gain, np.inf)</div><div class="line">        grad *= gains</div><div class="line">        update = momentum * update - learning_rate * grad</div><div class="line">        p += update</div><div class="line"></div><div class="line">    <span class="keyword">return</span> p, error, i</div><div class="line">sklearn.manifold.t_sne._gradient_descent = _gradient_descent</div><div class="line"></div><div class="line">X_proj = TSNE(random_state=RS).fit_transform(X)</div><div class="line"></div><div class="line">X_iter = np.dstack(position.reshape(<span class="number">-1</span>, <span class="number">2</span>)</div><div class="line">                   <span class="keyword">for</span> position <span class="keyword">in</span> positions)</div></pre></td></tr></table></figure></p>
+<p>使用moviepy包生成gif动画<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">f, ax, sc, txts = scatter(X_iter[..., <span class="number">-1</span>], y)</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">make_frame_mpl</span><span class="params">(t)</span>:</span></div><div class="line">    i = int(t*<span class="number">40</span>)</div><div class="line">    x = X_iter[..., i]</div><div class="line">    sc.set_offsets(x)</div><div class="line">    <span class="keyword">for</span> j, txt <span class="keyword">in</span> zip(range(<span class="number">10</span>), txts):</div><div class="line">        xtext, ytext = np.median(x[y == j, :], axis=<span class="number">0</span>)</div><div class="line">        txt.set_x(xtext)</div><div class="line">        txt.set_y(ytext)</div><div class="line">    <span class="keyword">return</span> mplfig_to_npimage(f)</div><div class="line"></div><div class="line">animation = mpy.VideoClip(make_frame_mpl,</div><div class="line">                          duration=X_iter.shape[<span class="number">2</span>]/<span class="number">40.</span>)</div><div class="line">animation.write_gif(<span class="string">"d:/dataVisualization/animation.gif"</span>, fps=<span class="number">20</span>)</div></pre></td></tr></table></figure></p>
+<p><img src="/img/animation.gif" alt="animation"><br>接着创建低维空间数据点的相似性矩阵的动画<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">n = <span class="number">1.</span> / (pdist(X_iter[..., <span class="number">-1</span>], <span class="string">"sqeuclidean"</span>) + <span class="number">1</span>)</div><div class="line">Q = n / (<span class="number">2.0</span> * np.sum(n))</div><div class="line">Q = squareform(Q)</div><div class="line"></div><div class="line">f = plt.figure(figsize=(<span class="number">6</span>, <span class="number">6</span>))</div><div class="line">ax = plt.subplot(aspect=<span class="string">'equal'</span>)</div><div class="line">im = ax.imshow(Q, interpolation=<span class="string">'none'</span>, cmap=pal)</div><div class="line">plt.axis(<span class="string">'tight'</span>)</div><div class="line">plt.axis(<span class="string">'off'</span>)</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">make_frame_mpl</span><span class="params">(t)</span>:</span></div><div class="line">    i = int(t*<span class="number">40</span>)</div><div class="line">    n = <span class="number">1.</span> / (pdist(X_iter[..., i], <span class="string">"sqeuclidean"</span>) + <span class="number">1</span>)</div><div class="line">    Q = n / (<span class="number">2.0</span> * np.sum(n))</div><div class="line">    Q = squareform(Q)</div><div class="line">    im.set_data(Q)</div><div class="line">    <span class="keyword">return</span> mplfig_to_npimage(f)</div><div class="line"></div><div class="line">animation = mpy.VideoClip(make_frame_mpl,</div><div class="line">                          duration=X_iter.shape[<span class="number">2</span>]/<span class="number">40.</span>)</div><div class="line">animation.write_gif(<span class="string">"d:/dataVisualization/animation_matrix.gif"</span>, fps=<span class="number">20</span>)</div></pre></td></tr></table></figure></p>
+<p><img src="/img/animation_matrix.gif" alt="animation"><br>可以看到相似性矩阵越来越接近原始数据的相似性矩阵。  </p>
+<p>#t-分布<br>下面解释一下选择1自由度t-分布的原因。一个半径为r的N维球体的体积与$r^N$成正比，当N非常大的时候，如果我们在这个球体中以均匀分布选择一些点，那么大多数点都会非常靠近球的表面，非常少的点会在中心附近。可以用模拟的方法阐释这个现象：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">npoints = <span class="number">1000</span></div><div class="line">plt.figure(figsize=(<span class="number">15</span>, <span class="number">4</span>))</div><div class="line"><span class="keyword">for</span> i, D <span class="keyword">in</span> enumerate((<span class="number">2</span>, <span class="number">5</span>, <span class="number">10</span>)):</div><div class="line">    <span class="comment"># Normally distributed points.</span></div><div class="line">    u = np.random.randn(npoints, D)</div><div class="line">    <span class="comment"># Now on the sphere.</span></div><div class="line">    u /= norm(u, axis=<span class="number">1</span>)[:, <span class="keyword">None</span>]</div><div class="line">    <span class="comment"># Uniform radius.</span></div><div class="line">    r = np.random.rand(npoints, <span class="number">1</span>)</div><div class="line">    <span class="comment"># Uniformly within the ball.</span></div><div class="line">    points = u * r**(<span class="number">1.</span>/D)</div><div class="line">    <span class="comment"># Plot.</span></div><div class="line">    ax = plt.subplot(<span class="number">1</span>, <span class="number">3</span>, i+<span class="number">1</span>)</div><div class="line">    ax.set_xlabel(<span class="string">'Ball radius'</span>)</div><div class="line">    <span class="keyword">if</span> i == <span class="number">0</span>:</div><div class="line">        ax.set_ylabel(<span class="string">'Distance from origin'</span>)</div><div class="line">    ax.hist(norm(points, axis=<span class="number">1</span>),</div><div class="line">            bins=np.linspace(<span class="number">0.</span>, <span class="number">1.</span>, <span class="number">50</span>))</div><div class="line">    ax.set_title(<span class="string">'D=%d'</span> % D, loc=<span class="string">'left'</span>)</div><div class="line">plt.savefig(<span class="string">'spheres-generated.png'</span>, dpi=<span class="number">100</span>, bbox_inches=<span class="string">'tight'</span>)</div></pre></td></tr></table></figure></p>
+<p><img src="/img/spheres.png" alt="spheres"><br>如果我们对高维空间中原始数据和低维空间映射的数据点使用相同的高斯分布，则会造成数据点与其邻居间距离分布的不平衡。而当算法想要在这两个空间中重复出相同的距离时，这种不平衡就会造成数据点间过度的吸引力，使数据点多靠近中心位置。而在低维空间使用1自由度的t-分布可以避免这个问题。1自由度的t-分布较高斯分布有更高尾部，补偿了因空间维度造成的距离分布的不平衡。<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">z = np.linspace(<span class="number">0.</span>, <span class="number">5.</span>, <span class="number">1000</span>)</div><div class="line">gauss = np.exp(-z**<span class="number">2</span>)</div><div class="line">cauchy = <span class="number">1</span>/(<span class="number">1</span>+z**<span class="number">2</span>)</div><div class="line">plt.figure()</div><div class="line">plt.plot(z, gauss, label=<span class="string">'Gaussian distribution'</span>)</div><div class="line">plt.plot(z, cauchy, label=<span class="string">'Cauchy distribution'</span>)</div><div class="line">plt.legend()</div><div class="line">plt.savefig(<span class="string">'distributions-generated.png'</span>, dpi=<span class="number">100</span>)</div></pre></td></tr></table></figure></p>
+<p><img src="/img/distributions.png" alt="distributions"><br>使用这个分布会得到更有效的数据可视化，不同的簇会有更明显的区分。  </p>
+<p>#参考文献：  </p>
+<ol>
+<li>van der Maaten, L. and Hinton, G. E. (2008). Visualizing data using<br>t-SNE. J. Machine Learning Res., 9.  </li>
+<li><a href="https://beta.oreilly.com/learning/an-illustrated-introduction-to-the-t-sne-algorithm" target="_blank" rel="external">https://beta.oreilly.com/learning/an-illustrated-introduction-to-the-t-sne-algorithm</a></li>
+</ol>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="http://mtpgm.com/2015/08/17/t-sne/" data-id="cixcb454h000cykio8i8jdb8p" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+        <a href="http://mtpgm.com/2015/08/17/t-sne/#comments" class="article-comment-link ds-thread-count" data-thread-key="http://mtpgm.com/2015/08/17/t-sne/">Comments</a>
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+        <a href="/2016/12/17/C-programming/" id="article-nav-newer" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">Newer</strong>
+            <div class="article-nav-title">
+                
+                    C语言学习
+                
+            </div>
+        </a>
+    
+    
+        <a href="/2015/08/14/lle/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">Older</strong>
+            <div class="article-nav-title">非线性维度下降之局部线性插值</div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    <section id="comments">
+    
+        
+    <div class="ds-thread" data-thread-key="2015/08/17/t-sne/" data-title="t-SNE:高维数据可视化" data-url="http://mtpgm.com/2015/08/17/t-sne/"></div>
+    <style>
+        #ds-thread #ds-reset .ds-textarea-wrapper {
+            background: none;
+        }
+        #ds-reset .ds-avatar img {
+            box-shadow: none;
+        }
+        #ds-reset .ds-gradient-bg {
+            background: #f7f7f7;
+        }
+        #ds-thread #ds-reset li.ds-tab a {
+            border-radius: 3px;
+        }
+        #ds-thread #ds-reset .ds-post-button {
+            color: white;
+            border: none;
+            box-shadow: none;
+            background: #d32;
+            text-shadow: none;
+            font-weight: normal;
+            font-family: 'Microsoft Yahei';
+        }
+        #ds-thread #ds-reset .ds-post-button:hover {
+            color: white;
+            background: #DE594C;
+        }
+        #ds-thread #ds-reset .ds-post-button:active {
+            background: #d32;
+        }
+        #ds-smilies-tooltip ul.ds-smilies-tabs li a.ds-current {
+            color: white;
+            background: #d32;
+            box-shadow: none;
+            text-shadow: none;
+            font-weight: normal;
+        }
+    </style>
+
+    
+    </section>
+
+</section>
+            
+                <aside id="sidebar">
+   
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">recent</h3>
+        <div class="widget">
+            <ul id="recent-post" class="">
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2016/12/27/activityflow/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2016/12/27/activityflow/" class="title">activityflow</a></p>
+                            <p class="item-date"><time datetime="2016-12-26T16:28:07.000Z" itemprop="datePublished">2016-12-27</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2016/12/18/Cplus-programming/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2016/12/18/Cplus-programming/" class="title">C++程序设计</a></p>
+                            <p class="item-date"><time datetime="2016-12-18T08:07:56.000Z" itemprop="datePublished">2016-12-18</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2016/12/17/C-programming/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2016/12/17/C-programming/" class="title">C语言学习</a></p>
+                            <p class="item-date"><time datetime="2016-12-17T10:40:08.000Z" itemprop="datePublished">2016-12-17</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2015/08/17/t-sne/" class="thumbnail">
+    
+    
+        <span style="background-image:url(/img/digits_tsne-generated.png)" alt="t-SNE:高维数据可视化" class="thumbnail-image"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2015/08/17/t-sne/" class="title">t-SNE:高维数据可视化</a></p>
+                            <p class="item-date"><time datetime="2015-08-17T14:26:30.000Z" itemprop="datePublished">2015-08-17</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2015/08/14/lle/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2015/08/14/lle/" class="title">非线性维度下降之局部线性插值</a></p>
+                            <p class="item-date"><time datetime="2015-08-14T01:18:41.000Z" itemprop="datePublished">2015-08-14</time></p>
+                        </div>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+    
+        
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">archives</h3>
+        <div class="widget">
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/08/">August 2015</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">July 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">June 2015</a><span class="archive-list-count">2</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">tags</h3>
+        <div class="widget">
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/C-C/">C/C++</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/data-visualization/">data visualization</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/neuroimaging/">neuroimaging</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/数据挖掘/">数据挖掘</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/机器学习/">机器学习</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/测度论/">测度论</a><span class="tag-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">tag cloud</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/C-C/" style="font-size: 20px;">C/C++</a> <a href="/tags/data-visualization/" style="font-size: 10px;">data visualization</a> <a href="/tags/neuroimaging/" style="font-size: 10px;">neuroimaging</a> <a href="/tags/数据挖掘/" style="font-size: 10px;">数据挖掘</a> <a href="/tags/机器学习/" style="font-size: 20px;">机器学习</a> <a href="/tags/测度论/" style="font-size: 10px;">测度论</a>
+        </div>
+    </div>
+
+    
+    <div id="toTop" class="fa fa-angle-up"></div>
+</aside>
+            
+        </div>
+        <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2016 mtpgm<br>
+        </div>
+    </div>
+</footer>
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+        
+    
+    <script type="text/javascript">
+    var duoshuoQuery = {short_name:'true'};
+    (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0]
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+    </script>
+
+
+
+    
+        <script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-share.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-video.min.js"></script>
+    
+    
+        <script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+    
+
+
+
+<!-- Custom Scripts -->
+<script src="/js/main.js"></script>
+
+    </div>
+</body>
+</html>
