@@ -161,7 +161,7 @@ var _hmt = _hmt || [];
         </div>
         <div class="article-info profile-block">
             <div class="article-info-block">
-                8
+                9
                 <span>posts</span>
             </div>
             <div class="article-info-block">
@@ -214,7 +214,7 @@ var _hmt = _hmt || [];
 
             
             <section id="main">
-    <article id="post-activityflow" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-newbeginning" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
         
@@ -222,7 +222,7 @@ var _hmt = _hmt || [];
                 
     
         <h1 itemprop="name">
-            <a class="article-title" href="/2016/12/27/activityflow/">activityflow</a>
+            <a class="article-title" href="/2017/01/05/newbeginning/">从零开始的序章</a>
         </h1>
     
 
@@ -231,19 +231,14 @@ var _hmt = _hmt || [];
                         
     <div class="article-date">
         <i class="fa fa-calendar"></i>
-        <a href="/2016/12/27/activityflow/">
-            <time datetime="2016-12-26T16:28:07.000Z" itemprop="datePublished">2016-12-27</time>
+        <a href="/2017/01/05/newbeginning/">
+            <time datetime="2017-01-04T22:02:31.000Z" itemprop="datePublished">2017-01-05</time>
         </a>
     </div>
 
 
                         
                         
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/neuroimaging/">neuroimaging</a>
-    </div>
-
                     </div>
                 
             </header>
@@ -252,7 +247,14 @@ var _hmt = _hmt || [];
         <div class="article-entry" itemprop="articleBody">
         
             
-            
+            <p>自感这几年来全浪费了，从来没有认真做好一件事，总是看到有趣的就看看，然后忘记。在2017年开始的第一月，认真读几本书吧。</p>
+<ol>
+<li>Theoretical neuroscience: computational and mathematical modeling of neural systems.</li>
+<li>Deep learning.</li>
+<li>Probabilistic graphical models.</li>
+<li>How to build a brain: a neural architecture for biological cognition.</li>
+</ol>
+
         
         </div>
         <footer class="article-footer">
@@ -262,7 +264,146 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://mtpgm.com/2016/12/27/activityflow/" data-id="cixcco8sp0000kciomsvu6o16" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://mtpgm.com/2017/01/05/newbeginning/" data-id="cixjihzpq0009f8iourrovvpn" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+        <a href="http://mtpgm.com/2017/01/05/newbeginning/#comments" class="article-comment-link ds-thread-count" data-thread-key="http://mtpgm.com/2017/01/05/newbeginning/">Comments</a>
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
+    <article id="post-activityflow" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+            
+	
+		<a href="/2016/12/27/activityflow/" itemprop="url">
+            <img src="/img/activityflow.png" class="article-banner" />
+        </a>
+	
+
+
+
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2016/12/27/activityflow/">静态fMRI数据中的信息流动</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2016/12/27/activityflow/">
+            <time datetime="2016-12-27T01:36:25.000Z" itemprop="datePublished">2016-12-27</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/neuroscience/">neuroscience</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            <p><p>大脑信号传播是通过突触完成的，具体表现是受到激发的神经元发出一个个spike，激活突触中的信号通路，这个过程一般在微秒级的时间尺度上完成的。通过测量血液中氧气浓度(BOLD信号)来间接反应大脑信号强度的fMRI技术的缺点正是时间分辨率太低，导致不能采集出神经元放电前后的变化，也就不能让我们检测到信号传导的前后顺序。即我们只能从磁共振扫描仪采集的大脑信号看出来大脑每个位置的信号随时间的波动。最近看nature neuroscience的网站，发现了一篇论文——“<a href="http://www.nature.com/neuro/journal/v19/n12/full/nn.4406.html">Activity flow over resting-state networks shapes cognitive task activations</a>“，单单是名字就很吸引人了，从相对静态的fMRI数据发现信息流动，是一个很神奇的设想。</p>
+            <p class="article-more-link">
+        <!-- <a href="/2016/12/27/activityflow/#more">Read More</a> -->
+				<a href="/2016/12/27/activityflow/">Read More</a>
+            </p>
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="http://mtpgm.com/2016/12/27/activityflow/" data-id="cixjihzq1000df8iotctme9jc" class="article-share-link"><i class="fa fa-share"></i>Share</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -399,7 +540,7 @@ int (*pf)(int, char);
 
 </div>
 
-    <a data-url="http://mtpgm.com/2016/12/18/Cplus-programming/" data-id="cixcco8sv0001kcio1i3qn5p9" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://mtpgm.com/2016/12/18/Cplus-programming/" data-id="cixjihzou0001f8iozunkkox3" class="article-share-link"><i class="fa fa-share"></i>Share</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -537,7 +678,7 @@ int main(){
 
 </div>
 
-    <a data-url="http://mtpgm.com/2016/12/17/C-programming/" data-id="cixcco8th0003kciosj0hblfc" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://mtpgm.com/2016/12/17/C-programming/" data-id="cixjihzol0000f8iowxz60ebe" class="article-share-link"><i class="fa fa-share"></i>Share</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -676,7 +817,7 @@ int main(){
 
 </div>
 
-    <a data-url="http://mtpgm.com/2015/08/17/t-sne/" data-id="cixcco8tz0009kciobxoi0zz4" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://mtpgm.com/2015/08/17/t-sne/" data-id="cixjihzpy000cf8ioggdbj5mm" class="article-share-link"><i class="fa fa-share"></i>Share</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -805,7 +946,7 @@ int main(){
 
 </div>
 
-    <a data-url="http://mtpgm.com/2015/08/14/lle/" data-id="cixcco8tn0005kcioq35skbh1" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://mtpgm.com/2015/08/14/lle/" data-id="cixjihzp70003f8iov8ilm3bq" class="article-share-link"><i class="fa fa-share"></i>Share</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -934,7 +1075,7 @@ int main(){
 
 </div>
 
-    <a data-url="http://mtpgm.com/2015/07/10/rock/" data-id="cixcco8tw0008kciolli6sm2u" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://mtpgm.com/2015/07/10/rock/" data-id="cixjihzpn0008f8io2bivijy8" class="article-share-link"><i class="fa fa-share"></i>Share</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1063,7 +1204,7 @@ int main(){
 
 </div>
 
-    <a data-url="http://mtpgm.com/2015/06/16/measure/" data-id="cixcco8u5000bkciokn56j3ir" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://mtpgm.com/2015/06/16/measure/" data-id="cixjihzpc0004f8ioxj6ly8j7" class="article-share-link"><i class="fa fa-share"></i>Share</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1192,7 +1333,7 @@ int main(){
 
 </div>
 
-    <a data-url="http://mtpgm.com/2015/06/12/nmf/" data-id="cixcco8tl0004kcioi57ei7gg" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://mtpgm.com/2015/06/12/nmf/" data-id="cixjihzph0005f8iofvand4a4" class="article-share-link"><i class="fa fa-share"></i>Share</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1282,7 +1423,7 @@ int main(){
                     <li>
                         
                         <div class="item-thumbnail">
-                            <a href="/2016/12/27/activityflow/" class="thumbnail">
+                            <a href="/2017/01/05/newbeginning/" class="thumbnail">
     
     
         <span class="thumbnail-image thumbnail-none"></span>
@@ -1293,8 +1434,27 @@ int main(){
                         
                         <div class="item-inner">
                             <p class="item-category"></p>
-                            <p class="item-title"><a href="/2016/12/27/activityflow/" class="title">activityflow</a></p>
-                            <p class="item-date"><time datetime="2016-12-26T16:28:07.000Z" itemprop="datePublished">2016-12-27</time></p>
+                            <p class="item-title"><a href="/2017/01/05/newbeginning/" class="title">从零开始的序章</a></p>
+                            <p class="item-date"><time datetime="2017-01-04T22:02:31.000Z" itemprop="datePublished">2017-01-05</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2016/12/27/activityflow/" class="thumbnail">
+    
+    
+        <span style="background-image:url(/img/activityflow.png)" alt="静态fMRI数据中的信息流动" class="thumbnail-image"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2016/12/27/activityflow/" class="title">静态fMRI数据中的信息流动</a></p>
+                            <p class="item-date"><time datetime="2016-12-27T01:36:25.000Z" itemprop="datePublished">2016-12-27</time></p>
                         </div>
                     </li>
                 
@@ -1355,25 +1515,6 @@ int main(){
                         </div>
                     </li>
                 
-                    <li>
-                        
-                        <div class="item-thumbnail">
-                            <a href="/2015/08/14/lle/" class="thumbnail">
-    
-    
-        <span class="thumbnail-image thumbnail-none"></span>
-    
-</a>
-
-                        </div>
-                        
-                        <div class="item-inner">
-                            <p class="item-category"></p>
-                            <p class="item-title"><a href="/2015/08/14/lle/" class="title">非线性维度下降之局部线性插值</a></p>
-                            <p class="item-date"><time datetime="2015-08-14T01:18:41.000Z" itemprop="datePublished">2015-08-14</time></p>
-                        </div>
-                    </li>
-                
             </ul>
         </div>
     </div>
@@ -1385,7 +1526,7 @@ int main(){
     <div class="widget-wrap">
         <h3 class="widget-title">archives</h3>
         <div class="widget">
-            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/08/">August 2015</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">July 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">June 2015</a><span class="archive-list-count">2</span></li></ul>
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/08/">August 2015</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">July 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">June 2015</a><span class="archive-list-count">2</span></li></ul>
         </div>
     </div>
 
@@ -1394,7 +1535,7 @@ int main(){
     <div class="widget-wrap">
         <h3 class="widget-title">tags</h3>
         <div class="widget">
-            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/C-C/">C/C++</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/data-visualization/">data visualization</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/neuroimaging/">neuroimaging</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/数据挖掘/">数据挖掘</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/机器学习/">机器学习</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/测度论/">测度论</a><span class="tag-list-count">1</span></li></ul>
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/C-C/">C/C++</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/data-visualization/">data visualization</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/neuroscience/">neuroscience</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/数据挖掘/">数据挖掘</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/机器学习/">机器学习</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/测度论/">测度论</a><span class="tag-list-count">1</span></li></ul>
         </div>
     </div>
 
@@ -1403,7 +1544,7 @@ int main(){
     <div class="widget-wrap">
         <h3 class="widget-title">tag cloud</h3>
         <div class="widget tagcloud">
-            <a href="/tags/C-C/" style="font-size: 20px;">C/C++</a> <a href="/tags/data-visualization/" style="font-size: 10px;">data visualization</a> <a href="/tags/neuroimaging/" style="font-size: 10px;">neuroimaging</a> <a href="/tags/数据挖掘/" style="font-size: 10px;">数据挖掘</a> <a href="/tags/机器学习/" style="font-size: 20px;">机器学习</a> <a href="/tags/测度论/" style="font-size: 10px;">测度论</a>
+            <a href="/tags/C-C/" style="font-size: 20px;">C/C++</a> <a href="/tags/data-visualization/" style="font-size: 10px;">data visualization</a> <a href="/tags/neuroscience/" style="font-size: 10px;">neuroscience</a> <a href="/tags/数据挖掘/" style="font-size: 10px;">数据挖掘</a> <a href="/tags/机器学习/" style="font-size: 20px;">机器学习</a> <a href="/tags/测度论/" style="font-size: 10px;">测度论</a>
         </div>
     </div>
 
@@ -1415,7 +1556,7 @@ int main(){
         <footer id="footer">
     <div class="outer">
         <div id="footer-info" class="inner">
-            &copy; 2016 mtpgm<br>
+            &copy; 2017 mtpgm<br>
         </div>
     </div>
 </footer>
