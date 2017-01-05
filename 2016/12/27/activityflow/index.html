@@ -12,7 +12,7 @@
 <meta property="og:site_name" content="Data Miner">
 <meta property="og:description" content="大脑信号传播是通过突触完成的，具体表现是受到激发的神经元发出一个个spike，激活突触中的信号通路，这个过程一般在微秒级的时间尺度上完成的。通过测量血液中氧气浓度(BOLD信号)来间接反应大脑信号强度的fMRI技术的缺点正是时间分辨率太低，导致不能采集出神经元放电前后的变化，也就不能让我们检测到信号传导的前后顺序。即我们只能从磁共振扫描仪采集的大脑信号看出来大脑每个位置的信号随时间的波动。最近看n">
 <meta property="og:image" content="http://mtpgm.com/img/activityflow.png">
-<meta property="og:updated_time" content="2017-01-05T09:35:41.274Z">
+<meta property="og:updated_time" content="2017-01-05T13:38:38.551Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="静态fMRI数据中的信息流动">
 <meta name="twitter:description" content="大脑信号传播是通过突触完成的，具体表现是受到激发的神经元发出一个个spike，激活突触中的信号通路，这个过程一般在微秒级的时间尺度上完成的。通过测量血液中氧气浓度(BOLD信号)来间接反应大脑信号强度的fMRI技术的缺点正是时间分辨率太低，导致不能采集出神经元放电前后的变化，也就不能让我们检测到信号传导的前后顺序。即我们只能从磁共振扫描仪采集的大脑信号看出来大脑每个位置的信号随时间的波动。最近看n">
@@ -357,7 +357,7 @@ def networkModel(G=1.0, Indep = 1.0, stimTimes=[], stimRegions=None, synapticWei
 
     return simulatedTimeseries
 
-simulatedRestTimeseries = networkModel1(G=G, Indep=Indep, stimTimes=[], stimRegions=None, numTimePoints=numTimePoints)
+simulatedRestTimeseries = networkModel(G=G, Indep=Indep, stimTimes=[], stimRegions=None, numTimePoints=numTimePoints)
 </pre>
 与hrf卷积，然后下采样到2s的分辨率
 <pre class="brush: py;">
@@ -404,7 +404,7 @@ plt.savefig('ActflowSim_RestfMRI_FCMat.png',dpi=600,transparent=True, bbox_inche
 
 </div>
 
-    <a data-url="http://mtpgm.com/2016/12/27/activityflow/" data-id="cixk6e3ee0003bkio1fi65q9a" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://mtpgm.com/2016/12/27/activityflow/" data-id="cixkf5f310004kgioh0w9h79h" class="article-share-link"><i class="fa fa-share"></i>Share</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
