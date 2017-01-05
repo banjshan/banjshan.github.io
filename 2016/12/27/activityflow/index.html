@@ -12,7 +12,7 @@
 <meta property="og:site_name" content="Data Miner">
 <meta property="og:description" content="大脑信号传播是通过突触完成的，具体表现是受到激发的神经元发出一个个spike，激活突触中的信号通路，这个过程一般在微秒级的时间尺度上完成的。通过测量血液中氧气浓度(BOLD信号)来间接反应大脑信号强度的fMRI技术的缺点正是时间分辨率太低，导致不能采集出神经元放电前后的变化，也就不能让我们检测到信号传导的前后顺序。即我们只能从磁共振扫描仪采集的大脑信号看出来大脑每个位置的信号随时间的波动。最近看n">
 <meta property="og:image" content="http://mtpgm.com/img/activityflow.png">
-<meta property="og:updated_time" content="2017-01-04T22:52:48.980Z">
+<meta property="og:updated_time" content="2017-01-05T09:35:41.274Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="静态fMRI数据中的信息流动">
 <meta name="twitter:description" content="大脑信号传播是通过突触完成的，具体表现是受到激发的神经元发出一个个spike，激活突触中的信号通路，这个过程一般在微秒级的时间尺度上完成的。通过测量血液中氧气浓度(BOLD信号)来间接反应大脑信号强度的fMRI技术的缺点正是时间分辨率太低，导致不能采集出神经元放电前后的变化，也就不能让我们检测到信号传导的前后顺序。即我们只能从磁共振扫描仪采集的大脑信号看出来大脑每个位置的信号随时间的波动。最近看n">
@@ -307,7 +307,7 @@ plt.colorbar()
 plt.savefig('ActflowSim_StructMat.png',dpi=600,transparent=True, bbox_inches='tight')
 </pre>
 
-<p><img src="/img/ActflowSim_StructMat.png" alt="ActflowSim_StructMat"><br>论文接着使用经典的spiking rate model来生成自发的大脑活动和任务态的大脑活动。<br>$$\tau_i\frac{dx_i}{dt}=-x_i+f_i(\sum _{j=1}^{n}w_{ji}x_j + bias_i)\ \ \ i=[1..n]$$<br>静息态：在每个时间点，每个单元的活性都设为0，然后对所有单元同时进行刺激，让刺激引发的spike通过网络传播。自相关项设为AR(1)，系数设为0.1。<br>$$\varepsilon_t=0.1*\varepsilon_{t-1}+normal(0,1)$$<br>任务态：对每一个任务，选出5个连续的单元，在需要进行刺激的时间点处，把刺激强度加到静息态随机刺激强度上，然后让活动沿着网络传播开来。就像在一张餐巾纸上面滴一滴墨水，让其扩散开来。</p>
+<p><img src="/img/ActflowSim_StructMat.png" alt="ActflowSim_StructMat"><br>论文接着使用经典的spiking rate model来生成自发的大脑活动和任务态的大脑活动。<br>$$\tau_i\frac{dx_i}{dt}=-x_i+f_i(\sum _{j=1}^{n}w_{ji}x_j + bias_i)\ \ \ i=[1..n]$$<br>静息态：在每个时间点，每个单元的活性都设为0，然后对所有单元同时进行刺激，让刺激引发的spike通过网络传播。自相关项设为AR(1)，系数设为0.1。<br>$$\varepsilon_t=0.1*\varepsilon_{t-1}+normal(0,1)$$<br>任务态：对每一个任务，选出5个连续的单元，在需要进行刺激的时间点处，把刺激强度加到静息态随机刺激强度上，然后让活动沿着网络传播开来。<font color="red">就像在一张餐巾纸上面滴一滴墨水，让其扩散开来</font>。</p>
 <pre class="brush: py;">
 def sigmoid(x):
     return 1/(1+np.exp(-x))
@@ -404,7 +404,7 @@ plt.savefig('ActflowSim_RestfMRI_FCMat.png',dpi=600,transparent=True, bbox_inche
 
 </div>
 
-    <a data-url="http://mtpgm.com/2016/12/27/activityflow/" data-id="cixjji4tl0003k8ioai1i3pp9" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://mtpgm.com/2016/12/27/activityflow/" data-id="cixk6e3ee0003bkio1fi65q9a" class="article-share-link"><i class="fa fa-share"></i>Share</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
