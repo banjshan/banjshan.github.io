@@ -3,14 +3,20 @@
 <head>
     <meta charset="utf-8">
     
-    <title>Archive: 2015/6 | Data Miner</title>
+    <title>Tensorflow基础 | Data Miner</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-    <meta property="og:type" content="website">
-<meta property="og:title" content="Data Miner">
-<meta property="og:url" content="http://mtpgm.com/archives/2015/06/index.html">
+    <meta name="description" content="Tensorflow是一个通过数据流图(data flow graph)进行数值运算的库。结点表示运算，边表示数据。所有的数据都是通过tensor来表示的。Tensor是向量和矩阵的一种推广，在tensorflow里面表示多维数组。每个tensor都有固定的数据类型（data type）和动态的维度，维度用3个数字表示，分别为rank, shape, 和dimension number。Tenso">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Tensorflow基础">
+<meta property="og:url" content="http://mtpgm.com/2017/01/11/tensorflow/index.html">
 <meta property="og:site_name" content="Data Miner">
+<meta property="og:description" content="Tensorflow是一个通过数据流图(data flow graph)进行数值运算的库。结点表示运算，边表示数据。所有的数据都是通过tensor来表示的。Tensor是向量和矩阵的一种推广，在tensorflow里面表示多维数组。每个tensor都有固定的数据类型（data type）和动态的维度，维度用3个数字表示，分别为rank, shape, 和dimension number。Tenso">
+<meta property="og:image" content="http://mtpgm.com/img/name_scope_1.png">
+<meta property="og:updated_time" content="2017-01-11T22:48:39.206Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Data Miner">
+<meta name="twitter:title" content="Tensorflow基础">
+<meta name="twitter:description" content="Tensorflow是一个通过数据流图(data flow graph)进行数值运算的库。结点表示运算，边表示数据。所有的数据都是通过tensor来表示的。Tensor是向量和矩阵的一种推广，在tensorflow里面表示多维数组。每个tensor都有固定的数据类型（data type）和动态的维度，维度用3个数字表示，分别为rank, shape, 和dimension number。Tenso">
+<meta name="twitter:image" content="http://mtpgm.com/img/name_scope_1.png">
     
 
     
@@ -213,76 +219,339 @@ var _hmt = _hmt || [];
 </aside>
 
             
-            <section id="main"><div class="timeline timeline-wrap">
-    
-            <div class="timeline-row timeline-row-major">
-                <span class="node"><i class="fa fa-calendar"></i></span>
-                <h1 class="title">2015</h1>
-            </div>
+            <section id="main"><article id="post-tensorflow" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
         
-        <div class="timeline-row">
-            <span class="node"></span>
-            <div class="content">
+        
+            <header class="article-header">
                 
     
-        <h1 itemprop="name">
-            <a class="timeline-article-title" href="/2015/06/16/measure/">测度论（一）</a>
+        <h1 class="article-title" itemprop="name">
+            Tensorflow基础
         </h1>
     
 
-                <div class="article-meta">
-                    
+                
+                    <div class="article-meta">
+                        
     <div class="article-date">
         <i class="fa fa-calendar"></i>
-        <a href="/2015/06/16/measure/">
-            <time datetime="2015-06-16T15:57:34.000Z" itemprop="datePublished">2015-06-16</time>
+        <a href="/2017/01/11/tensorflow/">
+            <time datetime="2017-01-11T12:51:03.000Z" itemprop="datePublished">2017-01-11</time>
         </a>
     </div>
 
 
-                    
-                    
+                        
+                        
     <div class="article-tag">
         <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/测度论/">测度论</a>
+        <a class="tag-link" href="/tags/deep-learning/">deep learning</a>
     </div>
 
-                </div>
-            </div>
-        </div>
-    
-        <div class="timeline-row">
-            <span class="node"></span>
-            <div class="content">
+                    </div>
                 
-    
-        <h1 itemprop="name">
-            <a class="timeline-article-title" href="/2015/06/12/nmf/">非负矩阵分解（NMF）</a>
-        </h1>
-    
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <p>Tensorflow是一个通过数据流图(data flow graph)进行数值运算的库。结点表示运算，边表示数据。所有的数据都是通过tensor来表示的。Tensor是向量和矩阵的一种推广，在tensorflow里面表示多维数组。每个tensor都有固定的数据类型（data type）和动态的维度，维度用3个数字表示，分别为rank, shape, 和dimension number。<font color="blue">Tensor rank</font>表示维度的个数，rank 0表示一个标量(Scalar)，rank 1等价于向量(Vector)，rank 2等价于矩阵(Matrix)，等等；对于tensor T，可以用T[i, j, k]这种方式访问里面的数值。<font color="blue">Tensor shape</font>表示维度的大小，比如2x2的矩阵，5x5x7的3维数组。<font color="blue">Tensor data type</font>包括tf.float32, tf.float64, tf.int8, tf.int16, tf.int32, tf.int64, tf.uint8(8 bits unsigned integer), tf.string(Variable length byte arrays. Each element of a tensor is a byte array.), tf.bool.<a id="more"></a></p>
+<p><font color="blue">Feed</font>机制可以在图上任意位置临时替换tensor的值。在run()里面使用feed_dict。<br>多数情况下，一个图被执行很多次，大多数tensor在一次执行后就会消失。<font color="blue">Tensor Variable</font>返回一个在图执行过程中永久存在，并且可变的tensor，通常用来表示模型中的参数。使用之前需要初始化，用tf.global_variables_initializer()初始化全部Variable，用tf.initialize_variables([])初始化某些变量。用Variable.assign()操作改变变量的值。</p>
+<pre class="brush: py;">
+import tensorflow as tf
+import numpy as np
+T = tf.constant([[[1,2],[2,3]],[[3,4],[5,6]]])
+print(T)
+#Tensor("Const_1:0", shape=(2, 2, 2), dtype=int32)
+with tf.Session() as sess: #结束后session自动关闭
+    print(sess.run(T[1,1,0]))
+#5
 
-                <div class="article-meta">
-                    
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2015/06/12/nmf/">
-            <time datetime="2015-06-12T15:12:26.000Z" itemprop="datePublished">2015-06-12</time>
-        </a>
-    </div>
+#交互式
+sess=tf.InteractiveSession()
+print(T[1,1,0].eval())
+sess.close()
 
+data = np.array([[1,2,3],[4,5,6]])
+#convert_to_tensor可以把tensor对象，numpy数组，列表，标量转换为tensor对象
+T_data = tf.convert_to_tensor(data, dtype=tf.float32)
 
-                    
-                    
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/机器学习/">机器学习</a>
-    </div>
+# feed, 临时替换某个tensor的值
+with tf.Session() as sess:
+    input1 = tf.placefolder(tf.int32) #需要传递dtype参数
+    input2 = tf.constant(1)
+    output = tf.add(input1, input2)
+    print(sess.run(output,feed_dict={input1:1})) # 2
+    print(sess.run(output,feed_dict={input1:1,input2:10})) # 11
 
-                </div>
-            </div>
+# Variable，接收一个tensor用来初始化
+b = tf.Variable(tf.zeros([1000]), name="bias")
+with tf.Session() as sess:
+    sess.run(tf.global_variables_initializer())
+    print(sess.run(b))
+
+# 保存数据流图
+tf.Graph.as_graph_def(from_version=None, add_shapes=False)
+</pre>
+
+<p>Tensor运算</p>
+<pre class="brush: py;">
+# matrix operations
+tf.transpose() #转置
+tf.matmul() #矩阵乘法
+tf.matrix_determinant() #行列式
+tf.matrix_inverse() #逆
+tf.matrix_solve() #求解
+
+# Reduction
+# 在tensor的某个维度上进行运算，输出维度少1的tensor
+tf.reduce_prod(x, reduction_indices) # reduce prod
+tf.reduce_min()
+tf.reduce_max()
+tf.reduce_mean()
+tf.reduce_all()
+tf.reduce_any()
+
+# Segmentation
+# 在某个维度上按照一个index array进行运算
+sess = tf.InteractiveSession()
+seg_ids = tf.constant([0,1,1,2,2]); # Group indexes : 0|1,2|3,4
+tens1 = tf.constant([[2, 5, 3, -5],  
+                    [0, 3,-2,  5], 
+                    [4, 3, 5,  3], 
+                    [6, 1, 4,  0],
+                    [6, 1, 4,  0]])
+tf.segment_sum(tens1, seg_ids).eval()
+# array([[ 2, 5, 3, -5],
+#        [ 4, 6, 3, 8],
+#        [12, 2, 8, 0]], dtype=int32)
+
+# Sequence
+tf.argmin()  #输出某个维度最小值的索引
+tf.argmax()
+tf.listdiff()
+tf.where()
+tf.unique()
+
+# shape transformations
+tf.shape(data)
+tf.reshape()
+
+# slicing and joining
+tf.slice(input_, begin, size, name=None) # cutting an slice
+# Splits a tensor into `num_split` tensors along one dimension
+tf.split(split_dim, num_split, value, name='split')
+# tf.tile([1,2],[3]) array([1, 2, 1, 2, 1, 2], dtype=int32)
+tf.tile(input, multiples, name=None)
+# padding 填充
+tf.pad(tensor, paddings, mode='CONSTANT', name=None)
+tf.concat() #concatenating
+tf.pack()
+tf.reverse()
+</pre>
+
+<p>读取文件</p>
+<pre class="brush: py;">
+# CSV
+tf.TextLineReader(ReaderBase)
+# Reading image data
+tf.WholeFileReader(ReaderBase)
+</pre>
+
+<p>Graph: tensorflow默认生成一个Graph对象，把操作都加进去。</p>
+<pre class="brush: py; highlight=[2,3];">
+# 创建一个新图,不影响默认的图对象
+new_g = tf.Graph()
+with new_g.as_default():
+    # 这里面的操作都会包含进图new_g中
+    a = tf.mul(2,3)
+    ...
+# 外面的操作放入default graph
+in_default_graph = tf.add(1,2)
+# 获取default graph
+default_graph = tf.get_default_graph()
+
+# 用于创建多个相互无关的图
+g1 = tf.Graph()
+g2 = tf.Graph()
+with g1.as_default():
+    ...
+with g2.as_default():
+    ...
+</pre>
+
+<p>name scopes: 用区块组织图，利于tensorboard可视化。</p>
+<pre class="brush: py;">
+import tensorflow as tf
+#block 1
+with tf.name_scope("Scope_A"):
+    a = tf.add(1,2,name="A_add")
+    b = tf.mul(a,3,name="A_mul")
+#block 2
+with tf.name_scope("Scope_B"):
+    c = tf.add(4,5,name="B_add")
+    d = tf.mul(c,6,name="B_mul")
+e = tf.add(b,d,name="output")
+# 打开SummaryWriter
+writer = tf.summary.FileWriter('./name_scope_1',graph=tf.get_default_graph())
+writer.close()
+</pre>
+
+<p>打开tensorboard<br>tensorboard –logdir=’./name_scope_1’ –port=8888<br>浏览器输入localhost:8888，得到<br><img src="/img/name_scope_1.png" alt="name_scope_1"></p>
+<p>Tensorboard: 交互式查看数据流图和程序运行结果</p>
+<pre class="brush: py;">
+tf.summary.FileWriter(dir, graph)
+</pre>
+
+<p>tensorboard –logdir=dir –port=6006<br>默认端口为6006</p>
+
+        
         </div>
-    
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
 </div>
+
+    <a data-url="http://mtpgm.com/2017/01/11/tensorflow/" data-id="cixtbrann000f1siosac7qfhx" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+        <a href="http://mtpgm.com/2017/01/11/tensorflow/#comments" class="article-comment-link ds-thread-count" data-thread-key="http://mtpgm.com/2017/01/11/tensorflow/">Comments</a>
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+    
+        <a href="/2017/01/05/newbeginning/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">Older</strong>
+            <div class="article-nav-title">从零开始的序章</div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    <section id="comments">
+    
+        
+    <div class="ds-thread" data-thread-key="2017/01/11/tensorflow/" data-title="Tensorflow基础" data-url="http://mtpgm.com/2017/01/11/tensorflow/"></div>
+    <style>
+        #ds-thread #ds-reset .ds-textarea-wrapper {
+            background: none;
+        }
+        #ds-reset .ds-avatar img {
+            box-shadow: none;
+        }
+        #ds-reset .ds-gradient-bg {
+            background: #f7f7f7;
+        }
+        #ds-thread #ds-reset li.ds-tab a {
+            border-radius: 3px;
+        }
+        #ds-thread #ds-reset .ds-post-button {
+            color: white;
+            border: none;
+            box-shadow: none;
+            background: #d32;
+            text-shadow: none;
+            font-weight: normal;
+            font-family: 'Microsoft Yahei';
+        }
+        #ds-thread #ds-reset .ds-post-button:hover {
+            color: white;
+            background: #DE594C;
+        }
+        #ds-thread #ds-reset .ds-post-button:active {
+            background: #d32;
+        }
+        #ds-smilies-tooltip ul.ds-smilies-tabs li a.ds-current {
+            color: white;
+            background: #d32;
+            box-shadow: none;
+            text-shadow: none;
+            font-weight: normal;
+        }
+    </style>
+
+    
+    </section>
+
 </section>
             
                 <aside id="sidebar">
